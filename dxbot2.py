@@ -5,7 +5,7 @@ import re
 import psycopg2
 
 from slackclient import SlackClient
-from lib.quotes import getQuote
+from lib.quotes import addQuote, getQuote
 
 # Create client
 client = SlackClient(os.environ.get('DXBOT_TOKEN'))
@@ -60,7 +60,7 @@ def parse_command(message_text):
     matches = re.search(COMMAND_REGEX, message_text, re.IGNORECASE)
     if matches:
         command = matches.group('command')
-        if len(matches.groups()) > 1:
+        if len(matches.groups()) > 1 and matches.group('message') != '':
             return (command, matches.group('message'))
         return (command, None)
     return (None, None)
@@ -75,8 +75,10 @@ def handle_command(command, args, channel):
 
     response = None
     if command.startswith('quote'):
-        response = 'Fuck you.'
-        getQuote()
+        if args is not None and len(args.split()) > 1:
+            response = addQuote(args, users)
+        else:
+            response = getQuote(args, users)
 
     client.api_call(
         'chat.postMessage',
