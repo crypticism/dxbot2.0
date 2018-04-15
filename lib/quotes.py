@@ -72,8 +72,7 @@ def getQuoteByID(args):
         cur.close()
         return 'There aren\'t that many quotes.'
 
-    sql = "SELECT id, name, quote FROM (SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes) a WHERE roww = %s;" % str(args)
-
+    sql = "SELECT ID,NAME,QUOTE FROM (SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes) a WHERE roww = CASE WHEN '%s' > 0 THEN '%s' WHEN '%s' > (SELECT COUNT(*) FROM quotes) THEN '1'ELSE (SELECT COUNT(*) + '%s' FROM quotes) END;" % str(args)
     cur.execute(sql)
     (_, name, quote) = cur.fetchone()
     cur.close()
@@ -142,3 +141,28 @@ def getQuote(args, users):
         return getQuoteByName(args, users)
 
     return 'Not implemented yet.'
+
+def getQuoteByLookup(args, users):
+    """
+    Retrieve a random quote containing a specific word.
+    """
+
+    conn = psycopg2.connect(CONNECT_STRING)
+    cur = conn.cursor()
+
+    sql = "SELECT COUNT(*) FROM quotes WHERE quote LIKE = '%%%s%%';" % str(args)
+
+    cur.execute(sql)
+    (count,) = cur.fetchone()
+
+    if not count:
+        cur.close()
+        return 'No quotes with {} in it'.format(args)
+
+    sql = "SELECT * FROM quotes where quote like '%%%s%%' ORDER BY RANDOM() LIMIT 1; " % str(args)
+
+    cur.execute(sql)
+    (num, name, quote) = cur.fetchone()
+    cur.close()
+
+    return '#{}: {} - "{}"'.format(num, name, quote)
