@@ -84,7 +84,7 @@ def getQuoteByID(args):
         ) THEN '1'ELSE (
             SELECT COUNT(*) + '%s' FROM quotes
         ) END;
-    """ % str(args)
+    """ % (str(args),str(args),str(args),str(args))
 
     cur.execute(sql)
     (_, name, quote) = cur.fetchone()
