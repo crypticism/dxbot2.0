@@ -1,0 +1,2 @@
+def getQuote():
+    print('test')
