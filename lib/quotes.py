@@ -12,7 +12,23 @@ def isInt(val):
 
 
 def addQuote(args, users):
-    return 'Not implemented yet.'
+    """
+    Insert a new quote into the database.
+    """
+    user = args.split()[0]
+    message = ' '.join(args.split()[1:])
+    if user not in users:
+        return '{} is not a valid user.'.format(args)
+
+    conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+    cur = conn.cursor()
+    cur.execute(
+        'INSERT INTO quotes (name, quote) VALUES (\'{}\', \'{}\');'
+        .format(user, message)
+    )
+    conn.commit()
+    cur.close()
+    return 'Quote added.'
 
 
 def getRandomQuote():
@@ -67,21 +83,21 @@ def getQuoteByName(args, users):
     """
     Retrieve a random quote from a specific user.
     """
-    if args.strip() in users:
-        conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM quotes WHERE name = \'{}\';'.format(args))
-        quotes = cur.fetchall()
-        if not len(quotes):
-            cur.close()
-            return '{} has no quotes.'.format(args)
-
-        index = random.randint(0, len(quotes) - 1)
-        (num, name, quote) = quotes[index]
-        cur.close()
-        return '#{}: {} - "{}"'.format(num, name, quote)
-    else:
+    if args.strip() not in users:
         return '{} is not a valid user.'.format(args)
+
+    conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM quotes WHERE name = \'{}\';'.format(args))
+    quotes = cur.fetchall()
+    if not len(quotes):
+        cur.close()
+        return '{} has no quotes.'.format(args)
+
+    index = random.randint(0, len(quotes) - 1)
+    (num, name, quote) = quotes[index]
+    cur.close()
+    return '#{}: {} - "{}"'.format(num, name, quote)
 
 
 def getQuote(args, users):

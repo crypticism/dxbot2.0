@@ -12,6 +12,8 @@ client = SlackClient(os.environ.get('DXBOT_TOKEN'))
 # User ID: Set after connecting
 dxbot_id = None
 users = []
+user_map = {}
+last_event = None
 
 # Constants
 READ_DELAY = 1  # 1 second read delay
@@ -36,7 +38,7 @@ def db_install():
         exit()
 
 
-def parse_bot_commands(slack_events):
+def parse_message(slack_events):
     """
     Parses a list of events coming from the Slack RTM API to find bot commands.
     If a bot command is found, this function retruns a tuple of
@@ -45,10 +47,13 @@ def parse_bot_commands(slack_events):
     """
     for event in slack_events:
         if event['type'] == 'message' and 'subtype' not in event:
+            global last_event
+            prev = last_event
+            last_event = event
             command, args = parse_command(event['text'])
             if command:
-                return command, args, event['channel']
-    return None, None, None
+                return command, args, event['channel'], prev
+    return None, None, None, None
 
 
 def parse_command(message_text):
@@ -66,7 +71,7 @@ def parse_command(message_text):
     return (None, None)
 
 
-def handle_command(command, args, channel):
+def handle_command(command, args, channel, prev):
     """
     Executes bot command if the command is known
     """
@@ -79,6 +84,10 @@ def handle_command(command, args, channel):
             response = addQuote(args, users)
         else:
             response = getQuote(args, users)
+
+    if command.startswith('grab'):
+        message = '{} {}'.format(user_map[prev['user']], prev['text'])
+        response = addQuote(message, users)
 
     client.api_call(
         'chat.postMessage',
@@ -98,8 +107,14 @@ if __name__ == "__main__":
             in client.api_call('users.list')['members']
             if member['name'] not in EXCLUSION_LIST
         ]
+        user_map = {
+            member['id']: member['name']
+            for member
+            in client.api_call('users.list')['members']
+            if member['name'] not in EXCLUSION_LIST
+        }
         while True:
-            command, args, channel = parse_bot_commands(client.rtm_read())
+            command, args, channel, prev = parse_message(client.rtm_read())
             if command:
-                handle_command(command, args, channel)
+                handle_command(command, args, channel, prev)
             time.sleep(READ_DELAY)
