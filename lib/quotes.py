@@ -1,6 +1,14 @@
+import os
 import random
 
 import psycopg2
+
+CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
+    os.getenv('DB_NAME', 'dxbot'),
+    os.getenv('DB_USER', 'postgres'),
+    os.getenv('DB_HOST', 'localhost'),
+    os.getenv('DB_PASS', '')
+)
 
 
 def isInt(val):
@@ -20,7 +28,7 @@ def addQuote(args, users):
     if user not in users:
         return '{} is not a valid user.'.format(args)
 
-    conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+    conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
     cur.execute(
         'INSERT INTO quotes (name, quote) VALUES (\'{}\', \'{}\');'
@@ -35,7 +43,7 @@ def getRandomQuote():
     """
     Retrieve a random quote from the database.
     """
-    conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+    conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
     cur.execute('SELECT COUNT(*) FROM quotes;')
     (count,) = cur.fetchone()
@@ -53,7 +61,7 @@ def getQuoteByID(args):
     """
     Retrieve a quote by a specific ID.
     """
-    conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+    conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
     cur.execute('SELECT COUNT(*) FROM quotes;')
     (count,) = cur.fetchone()
@@ -71,7 +79,7 @@ def getQuoteCount():
     """
     Retrieve the number of quotes in the database.
     """
-    conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+    conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
     cur.execute('SELECT COUNT(*) FROM quotes;')
     (count,) = cur.fetchone()
@@ -86,7 +94,7 @@ def getQuoteByName(args, users):
     if args.strip() not in users:
         return '{} is not a valid user.'.format(args)
 
-    conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+    conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
     cur.execute('SELECT * FROM quotes WHERE name = \'{}\';'.format(args))
     quotes = cur.fetchall()

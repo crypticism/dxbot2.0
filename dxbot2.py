@@ -17,8 +17,14 @@ last_event = None
 
 # Constants
 READ_DELAY = 1  # 1 second read delay
-COMMAND_CHARACTER = os.environ.get('COMMAND_CHARACTER')
+COMMAND_CHARACTER = os.getenv('COMMAND_CHARACTER', '!')
 COMMAND_REGEX = r"^" + re.escape(COMMAND_CHARACTER) + r"(?P<command>\w+) ?(?P<message>.*)?$"
+CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
+    os.getenv('DB_NAME', 'dxbot'),
+    os.getenv('DB_USER', 'postgres'),
+    os.getenv('DB_HOST', 'localhost'),
+    os.getenv('DB_PASS', '')
+)
 
 EXCLUSION_LIST = [
     'slackbot',
@@ -31,13 +37,13 @@ EXCLUSION_LIST = [
 
 def db_install():
     try:
-        conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+        conn = psycopg2.connect(CONNECT_STRING)
         cur = conn.cursor()
         cur.execute('SELECT * FROM quotes;')
         cur.close()
     except psycopg2.Error as e:
         if e and e.pgerror and 'does not exist' in e.pgerror:
-            conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+            conn = psycopg2.connect(CONNECT_STRING)
             cur = conn.cursor()
             cur.execute(
                 """
