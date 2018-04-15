@@ -31,7 +31,7 @@ def addQuote(args, users):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
     sql = "INSERT INTO quotes (name, quote) VALUES (%s, %s);"
-    cur.execute(sql, (user, message))
+    cur.execute(sql, (str(user), str(message)))
     conn.commit()
     cur.close()
     return 'Quote added.'
@@ -51,7 +51,7 @@ def getRandomQuote():
         index = random.randint(1, count)
 
         sql = "SELECT * FROM quotes WHERE id = %s;"
-        cur.execute(sql, str(index))
+        cur.execute(sql, (str(index)))
         (num, name, quote) = cur.fetchone()
         cur.close()
 
@@ -107,7 +107,7 @@ def getQuoteByName(args, users):
 
     sql = "SELECT * FROM quotes WHERE name = %s;"
 
-    cur.execute(sql, str(args))
+    cur.execute(sql, (str(args)))
     quotes = cur.fetchall()
 
     if not len(quotes):
