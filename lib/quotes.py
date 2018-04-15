@@ -72,7 +72,7 @@ def getQuoteByID(args):
         cur.close()
         return 'There aren\'t that many quotes.'
 
-    sql = "SELECT * FROM (SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes) a WHERE roww = %s;" % str(args)
+    sql = "SELECT id, name, quote FROM (SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes) a WHERE roww = %s;" % str(args)
 
     cur.execute(sql)
     (_, name, quote) = cur.fetchone()
