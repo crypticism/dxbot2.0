@@ -17,7 +17,9 @@ last_event = None
 
 # Constants
 READ_DELAY = 1  # 1 second read delay
-COMMAND_REGEX = r"^!(?P<command>\w+) ?(?P<message>.*)?$"
+COMMAND_CHARACTER = os.environ.get('COMMAND_CHARACTER')
+COMMAND_REGEX = r"^" + re.escape(COMMAND_CHARACTER) + r"(?P<command>\w+) ?(?P<message>.*)?$"
+
 EXCLUSION_LIST = [
     'slackbot',
     'scryfall',
@@ -32,10 +34,25 @@ def db_install():
         conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
         cur = conn.cursor()
         cur.execute('SELECT * FROM quotes;')
-        conn.close()
+        cur.close()
     except psycopg2.Error as e:
-        print('One of the necessary tables does not exist.')
-        exit()
+        if e and e.pgerror and 'does not exist' in e.pgerror:
+            conn = psycopg2.connect("dbname=dxbot user=postgres host=localhost")
+            cur = conn.cursor()
+            cur.execute(
+                """
+                CREATE TABLE quotes(
+                    id      SERIAL          PRIMARY KEY,
+                    name    varchar(50)     NOT NULL,
+                    quote   varchar(500)    NOT NULL
+                );
+                """
+            )
+            conn.commit()
+            cur.close()
+        else:
+            print('Error connecting to database.')
+            exit()
 
 
 def parse_message(slack_events):
