@@ -18,7 +18,8 @@ last_event = None
 # Constants
 READ_DELAY = 1  # 1 second read delay
 COMMAND_CHARACTER = os.getenv('COMMAND_CHARACTER', '!')
-COMMAND_REGEX = r"^" + re.escape(COMMAND_CHARACTER) + r"(?P<command>\w+) ?(?P<message>.*)?$"
+COMMAND_REGEX = r"^" + re.escape(COMMAND_CHARACTER) + \
+    r"(?P<command>\w+) ?(?P<message>.*)?$"
 CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
     os.getenv('DB_NAME', 'dxbot'),
     os.getenv('DB_USER', 'postgres'),
@@ -72,7 +73,8 @@ def parse_message(slack_events):
         if event['type'] == 'message' and 'subtype' not in event:
             global last_event
             prev = last_event
-            last_event = event if not event['text'].startswith(COMMAND_CHARACTER) else last_event
+            last_event = event if not \
+                event['text'].startswith(COMMAND_CHARACTER) else last_event
             command, args = parse_command(event['text'])
             if command:
                 return command, args, event['channel'], prev

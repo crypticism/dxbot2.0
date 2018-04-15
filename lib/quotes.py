@@ -1,5 +1,4 @@
 import os
-import random
 
 import psycopg2
 
@@ -30,10 +29,16 @@ def addQuote(args, users):
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
-    sql = "INSERT INTO quotes (name, quote) VALUES (%s, %s);" % (str(user), str(message))
+
+    sql = """
+        INSERT INTO quotes (name, quote)
+        VALUES ('%s', '%s');
+    """ % (str(user), str(message))
+
     cur.execute(sql)
     conn.commit()
     cur.close()
+
     return 'Quote added.'
 
 
@@ -49,11 +54,13 @@ def getRandomQuote():
 
     if count:
         sql = "SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1;"
+
         cur.execute(sql)
         (num, name, quote) = cur.fetchone()
         cur.close()
 
         return '#{}: {} - "{}"'.format(num, name, quote)
+
     cur.close()
     return 'There are no quotes.'
 
@@ -84,7 +91,7 @@ def getQuoteByID(args):
         ) THEN '1'ELSE (
             SELECT COUNT(*) + '%s' FROM quotes
         ) END;
-    """ % (str(args),str(args),str(args),str(args))
+    """ % (str(args), str(args), str(args), str(args))
 
     cur.execute(sql)
     (_, name, quote) = cur.fetchone()
@@ -99,9 +106,11 @@ def getQuoteCount():
     """
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
+
     cur.execute('SELECT COUNT(*) FROM quotes;')
     (count,) = cur.fetchone()
     cur.close()
+
     return 'There are {} quotes.'.format(count)
 
 
