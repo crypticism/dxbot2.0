@@ -105,7 +105,7 @@ def getQuoteByName(args, users):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    sql = "SELECT * FROM quotes WHERE name = %s;" % str(args)
+    sql = "SELECT * FROM quotes WHERE name = '%s;'" % str(args)
 
     cur.execute(sql)
     quotes = cur.fetchall()
