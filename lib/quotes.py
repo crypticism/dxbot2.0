@@ -48,9 +48,7 @@ def getRandomQuote():
     (count,) = cur.fetchone()
 
     if count:
-        index = random.randint(1, count)
-
-        sql = "SELECT * FROM quotes WHERE id = %s;" % str(index)
+        sql = "SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1;"
         cur.execute(sql)
         (num, name, quote) = cur.fetchone()
         cur.close()
@@ -74,7 +72,7 @@ def getQuoteByID(args):
         cur.close()
         return 'There aren\'t that many quotes.'
 
-    sql = "SELECT * FROM quotes WHERE id = %s;" % str(args)
+    sql = "SELECT * FROM (SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes) a WHERE roww = %s;" % str(args)
 
     cur.execute(sql)
     (_, name, quote) = cur.fetchone()
@@ -105,19 +103,19 @@ def getQuoteByName(args, users):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    sql = "SELECT * FROM quotes WHERE name = '%s';" % str(args)
+    sql = "SELECT COUNT(*) FROM quotes WHERE name = '%s';" % str(args)
 
     cur.execute(sql)
-    quotes = cur.fetchall()
+    (count,) = cur.fetchone()
 
-    print(sql, quotes)
-
-    if not len(quotes):
+    if not count:
         cur.close()
         return '{} has no quotes.'.format(args)
 
-    index = random.randint(0, len(quotes) - 1)
-    (num, name, quote) = quotes[index]
+    sql = "SELECT * FROM quotes WHERE name = '%s' ORDER BY RANDOM() LIMIT 1;" % str(args)
+
+    cur.execute(sql)
+    (num, name, quote) = cur.fetchone()
     cur.close()
 
     return '#{}: {} - "{}"'.format(num, name, quote)

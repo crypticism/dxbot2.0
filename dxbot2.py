@@ -72,7 +72,7 @@ def parse_message(slack_events):
         if event['type'] == 'message' and 'subtype' not in event:
             global last_event
             prev = last_event
-            last_event = event if not event['text'].startswith('!') else last_event
+            last_event = event if not event['text'].startswith(COMMAND_CHARACTER) else last_event
             command, args = parse_command(event['text'])
             if command:
                 return command, args, event['channel'], prev
