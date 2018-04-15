@@ -50,7 +50,7 @@ def db_install():
                 CREATE TABLE quotes(
                     id      SERIAL          PRIMARY KEY,
                     name    varchar(50)     NOT NULL,
-                    quote   varchar(500)    NOT NULL
+                    quote   varchar(2000)    NOT NULL
                 );
                 """
             )
