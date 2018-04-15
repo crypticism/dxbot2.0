@@ -107,7 +107,11 @@ def handle_command(command, args, channel, prev):
             response = addQuote(args, users)
         else:
             response = getQuote(args, users)
-
+    if command.startswith('lookup'):
+        if args is not None and len(args.split()) = 1:
+            response = getQuoteByLookup(args, users)
+        else:
+            response = 'Too many arguments provided'
     if command.startswith('grab'):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         response = addQuote(message, users)
