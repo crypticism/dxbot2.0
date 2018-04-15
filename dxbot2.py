@@ -5,7 +5,7 @@ import re
 import psycopg2
 
 from slackclient import SlackClient
-from lib.quotes import addQuote, getQuote
+from lib.quotes import addQuote, getQuote, getQuoteByLookup
 
 # Create client
 client = SlackClient(os.environ.get('DXBOT_TOKEN'))
@@ -107,11 +107,13 @@ def handle_command(command, args, channel, prev):
             response = addQuote(args, users)
         else:
             response = getQuote(args, users)
+
     if command.startswith('lookup'):
         if args is not None:
             response = getQuoteByLookup(args, users)
         else:
             response = 'No arguments provided'
+
     if command.startswith('grab'):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         response = addQuote(message, users)
