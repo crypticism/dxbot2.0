@@ -30,10 +30,8 @@ def addQuote(args, users):
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
-    cur.execute(
-        'INSERT INTO quotes (name, quote) VALUES (\'{}\', \'{}\');'
-        .format(user, message)
-    )
+    sql = "INSERT INTO quotes (name, quote) VALUES (%s, %s);"
+    cur.execute(sql, (user, message))
     conn.commit()
     cur.close()
     return 'Quote added.'
@@ -45,13 +43,18 @@ def getRandomQuote():
     """
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
+
     cur.execute('SELECT COUNT(*) FROM quotes;')
     (count,) = cur.fetchone()
+
     if count:
         index = random.randint(1, count)
-        cur.execute('SELECT * FROM quotes WHERE id = {};'.format(index))
+
+        sql = "SELECT * FROM quotes WHERE id = %s;"
+        cur.execute(sql, (index))
         (num, name, quote) = cur.fetchone()
         cur.close()
+
         return '#{}: {} - "{}"'.format(num, name, quote)
     cur.close()
     return 'There are no quotes.'
@@ -63,15 +66,20 @@ def getQuoteByID(args):
     """
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
+
     cur.execute('SELECT COUNT(*) FROM quotes;')
     (count,) = cur.fetchone()
+
     if int(args) > count:
         cur.close()
         return 'There aren\'t that many quotes.'
 
-    cur.execute('SELECT * FROM quotes WHERE id = {};'.format(args))
+    sql = "SELECT * FROM quotes WHERE id = %s;"
+
+    cur.execute(sql, (args))
     (_, name, quote) = cur.fetchone()
     cur.close()
+
     return '{} - "{}"'.format(name, quote)
 
 
@@ -96,8 +104,12 @@ def getQuoteByName(args, users):
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
-    cur.execute('SELECT * FROM quotes WHERE name = \'{}\';'.format(args))
+
+    sql = "SELECT * FROM quotes WHERE name = %s;"
+
+    cur.execute(sql, (args))
     quotes = cur.fetchall()
+
     if not len(quotes):
         cur.close()
         return '{} has no quotes.'.format(args)
@@ -105,6 +117,7 @@ def getQuoteByName(args, users):
     index = random.randint(0, len(quotes) - 1)
     (num, name, quote) = quotes[index]
     cur.close()
+
     return '#{}: {} - "{}"'.format(num, name, quote)
 
 
