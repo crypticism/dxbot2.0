@@ -51,7 +51,7 @@ def getRandomQuote():
         index = random.randint(1, count)
 
         sql = "SELECT * FROM quotes WHERE id = %s;"
-        cur.execute(sql, (index))
+        cur.execute(sql, str(index))
         (num, name, quote) = cur.fetchone()
         cur.close()
 
@@ -76,7 +76,7 @@ def getQuoteByID(args):
 
     sql = "SELECT * FROM quotes WHERE id = %s;"
 
-    cur.execute(sql, (args))
+    cur.execute(sql, str(args))
     (_, name, quote) = cur.fetchone()
     cur.close()
 
@@ -107,7 +107,7 @@ def getQuoteByName(args, users):
 
     sql = "SELECT * FROM quotes WHERE name = %s;"
 
-    cur.execute(sql, (args))
+    cur.execute(sql, str(args))
     quotes = cur.fetchall()
 
     if not len(quotes):
