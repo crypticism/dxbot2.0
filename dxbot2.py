@@ -153,13 +153,13 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith('++'):
         if args is not None:
-            response = incrementUser(args, users)
+            response = incrementUser(args, users, user_map)
         else:
             response = 'Specify a user.'
 
     if command.startswith('--'):
         if args is not None:
-            response = decrementUser(args, users)
+            response = decrementUser(args, users, user_map)
         else:
             response = 'Specify a user'
 

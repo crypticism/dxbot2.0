@@ -26,10 +26,20 @@ def addQuote(args, users, user_map):
     """
     updateUsageCount('Add Quote')
 
-    user = args.split()[0].replace('@', '')
-    message = ' '.join(args.split()[1:])
+    user = args.split()[0].strip()
+
+    if '<@' in user:
+        strippedUser = user[2:-1].strip()
+        user = user_map.get(strippedUser, None)
+        if user is None:
+            return '{} is not a valid user.'.format(args)
+
     if user not in users:
         return '{} is not a valid user.'.format(args)
+
+    message = ' '.join([
+        user_map[arg[2:-1]] if '<@' in arg else arg for arg in args.split()[1:]
+    ])
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
