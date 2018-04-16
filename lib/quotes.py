@@ -219,11 +219,14 @@ def getQuoteByLookup(args, users):
         sql = """
             SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
         """ % str(args)
+
         cur.execute(sql)
         (count,) = cur.fetchone()
-            if not count:
-                cur.close()
-                return 'No quotes with {} in it'.format(args)
+
+        if not count:
+            cur.close()
+            return 'No quotes with {} in it'.format(args)
+
         sql = """
             SELECT *
             FROM quotes
@@ -231,6 +234,7 @@ def getQuoteByLookup(args, users):
             ORDER BY RANDOM()
             LIMIT 1;
         """ % str(args)
+
     else:
         sql = """
             SELECT *
