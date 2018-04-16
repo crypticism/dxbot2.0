@@ -3,9 +3,10 @@ import time
 import re
 
 import psycopg2
-
 from slackclient import SlackClient
+
 from lib.quotes import addQuote, getQuote, getQuoteByLookup
+from lib.usage import getUsageCounts
 
 # Create client
 client = SlackClient(os.environ.get('DXBOT_TOKEN'))
@@ -40,21 +41,33 @@ def db_install():
     try:
         conn = psycopg2.connect(CONNECT_STRING)
         cur = conn.cursor()
-        cur.execute('SELECT * FROM quotes;')
+        cur.execute('SELECT COUNT(*) FROM quotes;')
+        cur.execute('SELECT COUNT(*) FROM usage;')
         cur.close()
     except psycopg2.Error as e:
         if e and e.pgerror and 'does not exist' in e.pgerror:
             conn = psycopg2.connect(CONNECT_STRING)
             cur = conn.cursor()
-            cur.execute(
-                """
-                CREATE TABLE quotes(
-                    id      SERIAL          PRIMARY KEY,
-                    name    varchar(50)     NOT NULL,
-                    quote   varchar(2000)    NOT NULL
-                );
-                """
-            )
+            if 'quotes' in e.pgerror:
+                cur.execute(
+                    """
+                    CREATE TABLE quotes(
+                        id      SERIAL          PRIMARY KEY,
+                        name    VARCHAR(50)     NOT NULL,
+                        quote   VARCHAR(2000)   NOT NULL
+                    );
+                    """
+                )
+            if 'usage' in e.pgerror:
+                cur.execute(
+                    """
+                    CREATE TABLE usage(
+                        id          SERIAL      PRIMARY KEY,
+                        function    VARCHAR(50) NOT NULL,
+                        count       INTEGER     NOT NULL
+                    );
+                    """
+                )
             conn.commit()
             cur.close()
         else:
@@ -119,6 +132,9 @@ def handle_command(command, args, channel, prev):
     if command.startswith('grab'):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         response = addQuote(message, users)
+
+    if command.startswith('usage'):
+        response = getUsageCounts()
 
     client.api_call(
         'chat.postMessage',
