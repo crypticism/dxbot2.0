@@ -45,6 +45,7 @@ def getUsageCounts():
     Retrieve the usage counts for all functions
     """
     updateUsageCount('Get Usage Counts')
+
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
