@@ -6,6 +6,7 @@ import psycopg2
 from slackclient import SlackClient
 
 from lib.leaderboard import decrementUser, getLeaderboard, incrementUser
+from lib.mcar import getChristian
 from lib.quotes import addQuote, getQuote, getQuoteByLookup
 from lib.usage import getUsageCounts
 
@@ -45,6 +46,8 @@ def db_install():
         cur.execute('SELECT COUNT(*) FROM quotes;')
         cur.execute('SELECT COUNT(*) FROM usage;')
         cur.execute('SELECT COUNT(*) FROM leaderboard')
+        cur.execute('SELECT COUNT(*) FROM christian_mc')
+        cur.execute('SELECT COUNT(*) FROM christian_ar')
         cur.close()
     except psycopg2.Error as e:
         if e and e.pgerror and 'does not exist' in e.pgerror:
@@ -79,6 +82,24 @@ def db_install():
                         id      SERIAL      PRIMARY KEY,
                         name    VARCHAR(50) NOT NULL,
                         count   INTEGER     NOT NULL
+                    );
+                    """
+                )
+
+            if 'christian_ar' in e.pgerror:
+                cur.execute(
+                    """
+                    CREATE TABLE christian_ar(
+                        id VARCHAR(300) NOT NULL
+                    );
+                    """
+                )
+
+            if 'christian_mc' in e.pgerror:
+                cur.execute(
+                    """
+                    CREATE TABLE christian_mc(
+                        id VARCHAR(300) NOT NULL
                     );
                     """
                 )
@@ -165,6 +186,8 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith('leaderboard'):
         response = getLeaderboard()
+    if command.startswith('christian'):
+        response = getChristian()
 
     client.api_call(
         'chat.postMessage',
