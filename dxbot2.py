@@ -165,6 +165,8 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith('leaderboard'):
         response = getLeaderboard()
+    if command.startswith('christian'):
+        response = getChristian()
 
     client.api_call(
         'chat.postMessage',
