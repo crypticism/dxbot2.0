@@ -5,6 +5,7 @@ import re
 import psycopg2
 from slackclient import SlackClient
 
+from lib.leaderboard import decrementUser, getLeaderboard, incrementUser
 from lib.quotes import addQuote, getQuote, getQuoteByLookup
 from lib.usage import getUsageCounts
 
@@ -20,7 +21,7 @@ last_event = None
 READ_DELAY = 1  # 1 second read delay
 COMMAND_CHARACTER = os.getenv('COMMAND_CHARACTER', '!')
 COMMAND_REGEX = r"^" + re.escape(COMMAND_CHARACTER) + \
-    r"(?P<command>\w+) ?(?P<message>.*)?$"
+    r"(?P<command>[\w+-]+) ?(?P<message>.*)?$"
 CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
     os.getenv('DB_NAME', 'dxbot'),
     os.getenv('DB_USER', 'postgres'),
@@ -43,6 +44,7 @@ def db_install():
         cur = conn.cursor()
         cur.execute('SELECT COUNT(*) FROM quotes;')
         cur.execute('SELECT COUNT(*) FROM usage;')
+        cur.execute('SELECT COUNT(*) FROM leaderboard')
         cur.close()
     except psycopg2.Error as e:
         if e and e.pgerror and 'does not exist' in e.pgerror:
@@ -58,6 +60,7 @@ def db_install():
                     );
                     """
                 )
+
             if 'usage' in e.pgerror:
                 cur.execute(
                     """
@@ -68,6 +71,18 @@ def db_install():
                     );
                     """
                 )
+
+            if 'leaderboard' in e.pgerror:
+                cur.execute(
+                    """
+                    CREATE TABLE leaderboard(
+                        id      SERIAL      PRIMARY KEY,
+                        name    VARCHAR(50) NOT NULL,
+                        count   INTEGER     NOT NULL
+                    );
+                    """
+                )
+
             conn.commit()
             cur.close()
         else:
@@ -135,6 +150,21 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith('usage'):
         response = getUsageCounts()
+
+    if command.startswith('++'):
+        if args is not None:
+            response = incrementUser(args, users)
+        else:
+            response = 'Specify a user.'
+
+    if command.startswith('--'):
+        if args is not None:
+            response = decrementUser(args, users)
+        else:
+            response = 'Specify a user'
+
+    if command.startswith('leaderboard'):
+        response = getLeaderboard()
 
     client.api_call(
         'chat.postMessage',
