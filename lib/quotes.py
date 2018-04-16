@@ -2,6 +2,8 @@ import os
 
 import psycopg2
 
+from .usage import updateUsageCount
+
 CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
     os.getenv('DB_NAME', 'dxbot'),
     os.getenv('DB_USER', 'postgres'),
@@ -22,6 +24,8 @@ def addQuote(args, users):
     """
     Insert a new quote into the database.
     """
+    updateUsageCount('Add Quote')
+
     user = args.split()[0]
     message = ' '.join(args.split()[1:])
     if user not in users:
@@ -46,6 +50,8 @@ def getRandomQuote():
     """
     Retrieve a random quote from the database.
     """
+    updateUsageCount('Get Random Quote')
+
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
@@ -69,6 +75,8 @@ def getQuoteByID(args):
     """
     Retrieve a quote by a specific ID.
     """
+    updateUsageCount('Get Quote By ID')
+
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
@@ -104,6 +112,8 @@ def getQuoteCount():
     """
     Retrieve the number of quotes in the database.
     """
+    updateUsageCount('Get Quote Count')
+
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
@@ -118,6 +128,8 @@ def getQuoteByName(args, users):
     """
     Retrieve a random quote from a specific user.
     """
+    updateUsageCount('Get Quote By Name')
+
     if args.strip() not in users:
         return '{} is not a valid user.'.format(args)
 
@@ -171,6 +183,7 @@ def getQuoteByLookup(args, users):
     """
     Retrieve a random quote containing a specific word.
     """
+    updateUsageCount('Lookup Quote')
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
