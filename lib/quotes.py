@@ -83,7 +83,7 @@ def getQuoteByID(args):
     cur.execute('SELECT COUNT(*) FROM quotes;')
     (count,) = cur.fetchone()
 
-    if int(args) > count:
+    if int(args) > count or abs(int(args))+1 > count:
         cur.close()
         return 'There aren\'t that many quotes.'
 
