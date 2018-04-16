@@ -189,7 +189,7 @@ def getQuoteByLookup(args, users):
     cur = conn.cursor()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\b%s\b.*'
+        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
     """ % str(args)
 
     cur.execute(sql)
@@ -203,7 +203,7 @@ def getQuoteByLookup(args, users):
         SELECT *
         FROM quotes
         WHERE quote
-        ~* '.*\b%s\b.*'
+        ~* '.*\y%s\y.*'
         ORDER BY RANDOM()
         LIMIT 1;
     """ % str(args)
