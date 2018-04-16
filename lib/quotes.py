@@ -209,23 +209,37 @@ def getQuoteByLookup(args, users):
     cur = conn.cursor()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*' OR quote ILIKE '%%%s%%'
-    """ % (str(args), str(args))
+        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
+    """ % str(args)
 
     cur.execute(sql)
     (count,) = cur.fetchone()
 
     if not count:
-        cur.close()
-        return 'No quotes with {} in it'.format(args)
-
-    sql = """
-        SELECT *
-        FROM quotes
-        WHERE quote ~* '.*\y%s\y.*' OR quote ILIKE '%%%s%%'
-        ORDER BY RANDOM()
-        LIMIT 1;
-    """ % (str(args), str(args))
+        sql = """
+            SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
+        """ % str(args)
+        cur.execute(sql)
+        (count,) = cur.fetchone()
+            if not count:
+                cur.close()
+                return 'No quotes with {} in it'.format(args)
+            else:
+            sql = """
+                SELECT *
+                FROM quotes
+                WHERE quote ILIKE '%%%s%%'
+                ORDER BY RANDOM()
+                LIMIT 1;
+            """ % str(args)
+    else:
+        sql = """
+            SELECT *
+            FROM quotes
+            WHERE quote ~* '.*\y%s\y.*'
+            ORDER BY RANDOM()
+            LIMIT 1;
+        """ % str(args)
 
     cur.execute(sql)
     (num, name, quote) = cur.fetchone()
