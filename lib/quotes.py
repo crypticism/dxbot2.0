@@ -203,7 +203,7 @@ def getQuoteByLookup(args, users):
         SELECT *
         FROM quotes
         WHERE quote
-        ILIKE '%%%s%%'
+        ILIKE ~* '.*\b%s\b.*'
         ORDER BY RANDOM()
         LIMIT 1;
     """ % str(args)
