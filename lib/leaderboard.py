@@ -69,7 +69,9 @@ def decrementUser(args, users):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    sql = "SELECT COUNT(*) FROM leaderboard WHERE name = '%s';" % args.strip()
+    sql = """
+      SELECT COUNT(*) FROM leaderboard WHERE name = '%s';
+    """ % args.strip().replace('@', '')
 
     cur.execute(sql)
     (count,) = cur.fetchone()
@@ -79,19 +81,19 @@ def decrementUser(args, users):
           UPDATE leaderboard
           SET count = count - 1
           WHERE name = '%s';
-        """ % args.strip()
+        """ % args.strip().replace('@', '')
     else:
         sql = """
         INSERT INTO leaderboard
         (name, count)
         VALUES ('%s', -1);
-        """ % args.strip()
+        """ % args.strip().replace('@', '')
 
     cur.execute(sql)
 
     sql = """
       SELECT name, count FROM leaderboard WHERE name = '%s';
-    """ % args.strip()
+    """ % args.strip().replace('@', '')
 
     cur.execute(sql)
     (name, count) = cur.fetchone()

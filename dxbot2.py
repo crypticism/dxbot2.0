@@ -134,9 +134,9 @@ def handle_command(command, args, channel, prev):
     response = None
     if command.startswith('quote'):
         if args is not None and len(args.split()) > 1:
-            response = addQuote(args, users)
+            response = addQuote(args, users, user_map)
         else:
-            response = getQuote(args, users)
+            response = getQuote(args, users, user_map)
 
     if command.startswith('lookup'):
         if args is not None:
