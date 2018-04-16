@@ -11,6 +11,7 @@ CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
     os.getenv('DB_PASS', '')
 )
 
+
 def getChristian():
     """
     Retrieve a random mcar from the database.
@@ -21,10 +22,10 @@ def getChristian():
     cur = conn.cursor()
 
     sql = """
-    SELECT * FROM christian_mc
-    INNER JOIN christian_ar
-    ON 1=1
-    ORDER BY RANDOM() LIMIT 1;
+        SELECT * FROM christian_mc
+        INNER JOIN christian_ar
+        ON 1=1
+        ORDER BY RANDOM() LIMIT 1;
     """
 
     cur.execute(sql)
@@ -32,4 +33,3 @@ def getChristian():
     cur.close()
 
     return 'Christian is the {} of all of {}'.format(mc, ar)
-
