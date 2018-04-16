@@ -20,16 +20,26 @@ def isInt(val):
         return False
 
 
-def addQuote(args, users):
+def addQuote(args, users, user_map):
     """
     Insert a new quote into the database.
     """
     updateUsageCount('Add Quote')
 
-    user = args.split()[0]
-    message = ' '.join(args.split()[1:])
+    user = args.split()[0].strip()
+
+    if '<@' in user:
+        strippedUser = user[2:-1].strip()
+        user = user_map.get(strippedUser, None)
+        if user is None:
+            return '{} is not a valid user.'.format(args)
+
     if user not in users:
         return '{} is not a valid user.'.format(args)
+
+    message = ' '.join([
+        user_map[arg[2:-1]] if '<@' in arg else arg for arg in args.split()[1:]
+    ])
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
@@ -124,30 +134,40 @@ def getQuoteCount():
     return 'There are {} quotes.'.format(count)
 
 
-def getQuoteByName(args, users):
+def getQuoteByName(args, users, user_map):
     """
     Retrieve a random quote from a specific user.
     """
     updateUsageCount('Get Quote By Name')
 
-    if args.strip() not in users:
+    user = args.strip()
+
+    if '<@' in user:
+        strippedUser = user[2:-1].strip()
+        user = user_map.get(strippedUser, None)
+        if user is None:
+            return '{} is not a valid user.'.format(args)
+
+    if user not in users:
         return '{} is not a valid user.'.format(args)
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    sql = "SELECT COUNT(*) FROM quotes WHERE name = '%s';" % str(args)
+    sql = """
+        SELECT COUNT(*) FROM quotes WHERE name = '%s';
+    """ % user
 
     cur.execute(sql)
     (count,) = cur.fetchone()
 
     if not count:
         cur.close()
-        return '{} has no quotes.'.format(args)
+        return '{} has no quotes.'.format(user)
 
     sql = """
         SELECT * FROM quotes WHERE name = '%s' ORDER BY RANDOM() LIMIT 1;
-    """ % str(args)
+    """ % user
 
     cur.execute(sql)
     (num, name, quote) = cur.fetchone()
@@ -156,7 +176,7 @@ def getQuoteByName(args, users):
     return '#{}: {} - "{}"'.format(num, name, quote)
 
 
-def getQuote(args, users):
+def getQuote(args, users, user_map):
     """
     Retrieves quotes from the database based on the type of arg passed in
     No args - retrieves a random quote
@@ -174,7 +194,7 @@ def getQuote(args, users):
         return getQuoteCount()
 
     if type(args) is str:
-        return getQuoteByName(args, users)
+        return getQuoteByName(args, users, user_map)
 
     return 'Not implemented yet.'
 
