@@ -1,4 +1,5 @@
 import os
+import re
 
 import psycopg2
 
@@ -207,6 +208,9 @@ def getQuoteByLookup(args, users):
 
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
+
+    if not re.search('[\w\s]+', args):
+        return "That's not a safe string. Please try again."
 
     sql = """
         SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
