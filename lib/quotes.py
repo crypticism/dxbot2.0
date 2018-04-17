@@ -46,10 +46,10 @@ def addQuote(args, users, user_map):
 
     sql = """
         INSERT INTO quotes (name, quote)
-        VALUES ('%s', '%s');
-    """ % (str(user), str(message))
+        VALUES (%s, %s);
+    """
 
-    cur.execute(sql)
+    cur.execute(sql, (user, message))
     conn.commit()
     cur.close()
 
@@ -103,15 +103,15 @@ def getQuoteByID(args):
             SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes
         ) a
         WHERE roww = CASE
-        WHEN '%s' > 0 THEN '%s'
-        WHEN '%s' > (
+        WHEN %s > 0 THEN %s
+        WHEN %s > (
             SELECT COUNT(*) FROM quotes
         ) THEN '1'ELSE (
-            SELECT COUNT(*) + '%s' FROM quotes
+            SELECT COUNT(*) + %s FROM quotes
         ) END;
-    """ % (str(args), str(args), str(args), str(args))
+    """
 
-    cur.execute(sql)
+    cur.execute(sql, (args, args, args, args))
     (_, name, quote) = cur.fetchone()
     cur.close()
 
@@ -155,10 +155,10 @@ def getQuoteByName(args, users, user_map):
     cur = conn.cursor()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE name = '%s';
-    """ % user
+        SELECT COUNT(*) FROM quotes WHERE name = %s;
+    """
 
-    cur.execute(sql)
+    cur.execute(sql, (user,))
     (count,) = cur.fetchone()
 
     if not count:
@@ -166,10 +166,10 @@ def getQuoteByName(args, users, user_map):
         return '{} has no quotes.'.format(user)
 
     sql = """
-        SELECT * FROM quotes WHERE name = '%s' ORDER BY RANDOM() LIMIT 1;
-    """ % user
+        SELECT * FROM quotes WHERE name = %s ORDER BY RANDOM() LIMIT 1;
+    """
 
-    cur.execute(sql)
+    cur.execute(sql, (user,))
     (num, name, quote) = cur.fetchone()
     cur.close()
 
@@ -210,7 +210,7 @@ def getQuoteByLookup(args, users):
 
     sql = """
         SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
-    """ % str(args)
+    """ % args
 
     cur.execute(sql)
     (count,) = cur.fetchone()
@@ -218,7 +218,7 @@ def getQuoteByLookup(args, users):
     if not count:
         sql = """
             SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
-        """ % str(args)
+        """ % args
 
         cur.execute(sql)
         (count,) = cur.fetchone()
@@ -233,7 +233,7 @@ def getQuoteByLookup(args, users):
             WHERE quote ILIKE '%%%s%%'
             ORDER BY RANDOM()
             LIMIT 1;
-        """ % str(args)
+        """ % args
 
     else:
         sql = """
@@ -242,7 +242,7 @@ def getQuoteByLookup(args, users):
             WHERE quote ~* '.*\y%s\y.*'
             ORDER BY RANDOM()
             LIMIT 1;
-        """ % str(args)
+        """ % args
 
     cur.execute(sql)
     (num, name, quote) = cur.fetchone()
