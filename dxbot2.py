@@ -167,7 +167,7 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith('grab'):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
-        response = addQuote(message, users)
+        response = addQuote(message, users, user_map)
 
     if command.startswith('usage'):
         response = getUsageCounts()
