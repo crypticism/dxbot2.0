@@ -1,8 +1,7 @@
+import os
 import psycopg2
 
-import os
-
-from .usage import updateUsageCount
+from lib.usage import updateUsageCount
 
 CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
     os.getenv('DB_NAME', 'dxbot'),

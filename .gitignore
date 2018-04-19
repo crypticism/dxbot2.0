@@ -101,3 +101,4 @@ ENV/
 
 env.sh
 dxbot/
+.vscode/

@@ -7,7 +7,7 @@ from slackclient import SlackClient
 
 from lib.leaderboard import decrementUser, getLeaderboard, incrementUser
 from lib.mcar import getChristian
-from lib.quotes import addQuote, getQuote, getQuoteByLookup
+from lib.quotes import addQuote, getLookupCount, getQuote, getQuoteByLookup
 from lib.usage import getUsageCounts
 
 # Create client
@@ -161,7 +161,10 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith('lookup'):
         if args is not None:
-            response = getQuoteByLookup(args, users)
+            if re.search('^[\w\s]+#$', args):
+                response = getLookupCount(args, users)
+            else:
+                response = getQuoteByLookup(args, users)
         else:
             response = 'No arguments provided'
 

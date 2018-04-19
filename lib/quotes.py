@@ -1,9 +1,8 @@
 import os
+import psycopg2
 import re
 
-import psycopg2
-
-from .usage import updateUsageCount
+from lib.usage import updateUsageCount
 
 CONNECT_STRING = 'dbname={} user={} host={} password={}'.format(
     os.getenv('DB_NAME', 'dxbot'),
@@ -206,11 +205,11 @@ def getQuoteByLookup(args, users):
     """
     updateUsageCount('Lookup Quote')
 
-    conn = psycopg2.connect(CONNECT_STRING)
-    cur = conn.cursor()
-
     if not re.search('^[\w\s]+$', args):
         return "That's not a safe string. Please try again."
+
+    conn = psycopg2.connect(CONNECT_STRING)
+    cur = conn.cursor()
 
     sql = """
         SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
@@ -253,3 +252,41 @@ def getQuoteByLookup(args, users):
     cur.close()
 
     return '#{}: {} - "{}"'.format(num, name, quote)
+
+def getLookupCount(args, users):
+    """
+    Retrieve the count of quotes with a specific word
+    """
+    updateUsageCount('Lookup Count')
+
+    conn = psycopg2.connect(CONNECT_STRING)
+    cur = conn.cursor()
+
+    if not re.search('^[\w\s]+#$', args):
+        return "That's not a safe string. Please try again."
+
+    searchString = args.replace('#', '').strip()
+
+    sql = """
+        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
+    """ % searchString
+
+    cur.execute(sql)
+    (count,) = cur.fetchone()
+
+    if count:
+        cur.close()
+        return "There are {} quotes containing {}.".format(count, searchString)
+
+    sql = """
+        SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
+    """ % searchString
+
+    cur.execute(sql)
+    (count,) = cur.fetchone()
+
+    if count:
+        cur.close()
+        return "There are {} quotes containing {}.".format(count, searchString)
+
+    return "There are no quotes with {} in it.".format(searchString)
