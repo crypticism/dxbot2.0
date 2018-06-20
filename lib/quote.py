@@ -65,11 +65,11 @@ def getRandomQuote():
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    cur.execute('SELECT COUNT(*) FROM quotes;')
+    cur.execute('SELECT COUNT(*) FROM prank;')
     (count,) = cur.fetchone()
 
     if count:
-        sql = "SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1;"
+        sql = "SELECT * FROM prank ORDER BY RANDOM() LIMIT 1;"
 
         cur.execute(sql)
         (num, name, quote) = cur.fetchone()
@@ -90,7 +90,7 @@ def getQuoteByID(args):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    cur.execute('SELECT COUNT(*) FROM quotes;')
+    cur.execute('SELECT COUNT(*) FROM prank;')
     (count,) = cur.fetchone()
 
     if int(args) > count or abs(int(args))+1 > count:
@@ -100,14 +100,14 @@ def getQuoteByID(args):
     sql = """
         SELECT ID,NAME,QUOTE
         FROM (
-            SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes
+            SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM prank
         ) a
         WHERE roww = CASE
         WHEN %s > 0 THEN %s
         WHEN %s > (
-            SELECT COUNT(*) FROM quotes
+            SELECT COUNT(*) FROM prank
         ) THEN '1'ELSE (
-            SELECT COUNT(*) + %s FROM quotes
+            SELECT COUNT(*) + %s FROM prank
         ) END;
     """
 
@@ -127,7 +127,7 @@ def getQuoteCount():
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    cur.execute('SELECT COUNT(*) FROM quotes;')
+    cur.execute('SELECT COUNT(*) FROM prank;')
     (count,) = cur.fetchone()
     cur.close()
 
@@ -155,7 +155,7 @@ def getQuoteByName(args, users, user_map):
     cur = conn.cursor()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE name = %s;
+        SELECT COUNT(*) FROM prank WHERE name = %s;
     """
 
     cur.execute(sql, (user,))
@@ -166,7 +166,7 @@ def getQuoteByName(args, users, user_map):
         return '{} has no quotes.'.format(user)
 
     sql = """
-        SELECT * FROM quotes WHERE name = %s ORDER BY RANDOM() LIMIT 1;
+        SELECT * FROM prank WHERE name = %s ORDER BY RANDOM() LIMIT 1;
     """
 
     cur.execute(sql, (user,))
