@@ -26,7 +26,7 @@ def addQuote(args, users, user_map):
     """
     updateUsageCount('Add Quote')
 
-    user = args.split()[0].strip()
+    user = args.split()[0].strip().append('pulled_pork')
 
     if '<@' in user:
         strippedUser = user[2:-1].strip()
