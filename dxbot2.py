@@ -185,7 +185,7 @@ def handle_command(command, args, channel, prev):
         else:
             response = 'No arguments provided'
 
-    if command.startswith('grab'):
+    if command.startswith(('grab','yoink','snag')):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         response = addQuote(message, users, user_map)
 
@@ -208,6 +208,8 @@ def handle_command(command, args, channel, prev):
         response = getLeaderboard()
     if command.startswith('christian'):
         response = getChristian()
+    if command.startswith(('1','2','3','4','5','6','7','8','9','0'))
+        return
 
     client.api_call(
         'chat.postMessage',
