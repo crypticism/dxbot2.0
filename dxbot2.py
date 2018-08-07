@@ -208,7 +208,7 @@ def handle_command(command, args, channel, prev):
         response = getLeaderboard()
     if command.startswith('christian'):
         response = getChristian()
-    if command.startswith(('1','2','3','4','5','6','7','8','9','0'))
+    if (command[0] or '0').isdigit():
         return
 
     client.api_call(
