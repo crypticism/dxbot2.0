@@ -53,6 +53,17 @@ def refresh_users():
         if member['name'] not in EXCLUSION_LIST
     }
 
+def spongeify(message):
+    flip = False
+    build = ''
+    for i in message:
+      if flip:
+        build += i.upper()
+      else:
+        build += i.lower()
+      if i.isalpha():
+        flip = not flip
+    return build
 
 def db_install():
     try:
@@ -187,7 +198,10 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith(('grab','yoink','snag')):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
-        response = addQuote(message, users, user_map)
+        if command.startswith('yoink'):
+            response = addQuote(spongeify(message), users, user_map)
+        else:
+            response = addQuote(message, users, user_map)
 
     if command.startswith('usage'):
         response = getUsageCounts()
