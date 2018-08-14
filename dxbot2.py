@@ -39,6 +39,20 @@ EXCLUSION_LIST = [
     'resistance_bot'
 ]
 
+def refresh_users():
+    users = [
+        member['name']
+        for member
+        in client.api_call('users.list')['members']
+        if member['name'] not in EXCLUSION_LIST
+    ]
+    user_map = {
+        member['id']: member['name']
+        for member
+        in client.api_call('users.list')['members']
+        if member['name'] not in EXCLUSION_LIST
+    }
+
 
 def db_install():
     try:
@@ -153,6 +167,8 @@ def handle_command(command, args, channel, prev):
 
     default_response = 'That is not a valid command.'
 
+    refresh_users()
+
     response = None
     if command.startswith('quote'):
         if args is not None and len(args.split()) > 1:
@@ -205,18 +221,7 @@ if __name__ == "__main__":
     if client.rtm_connect(with_team_state=False):
         print('dxbot has connected')
         dxbot_id = client.api_call('auth.test').get('user_id')
-        users = [
-            member['name']
-            for member
-            in client.api_call('users.list')['members']
-            if member['name'] not in EXCLUSION_LIST
-        ]
-        user_map = {
-            member['id']: member['name']
-            for member
-            in client.api_call('users.list')['members']
-            if member['name'] not in EXCLUSION_LIST
-        }
+        refresh_users()
         while True:
             command, args, channel, prev = parse_message(client.rtm_read())
             if command:
