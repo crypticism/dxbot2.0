@@ -81,8 +81,8 @@ def getLookupCount(args, users):
     searchString = args.replace('#', '').strip()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
-    """ % searchString
+        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
+    """ % args
 
     cur.execute(sql)
     (count,) = cur.fetchone()
@@ -90,5 +90,19 @@ def getLookupCount(args, users):
     if count:
         cur.close()
         return "There are {} quotes containing {}.".format(count, searchString)
+    else:
+        cur.close()
+        sql = """
+            SELECT *
+            FROM quotes
+            WHERE quote ILIKE '%%%s%%'
+            ORDER BY RANDOM()
+            LIMIT 1;
+        """ % args
+        cur.execute(sql)
+        (count,) = cur.fetchone()
+        if count:
+            return "There are {} quotes containing {}.".format(count, searchString)
+
 
     return "There are no quotes with {} in it.".format(searchString)
