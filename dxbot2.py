@@ -54,16 +54,8 @@ def refresh_users():
     }
 
 def spongeify(message):
-    flip = False
-    build = ''
-    for i in message:
-      if flip:
-        build += i.upper()
-      else:
-        build += i.lower()
-      if i.isalpha():
-        flip = not flip
-    return build
+    return ''.join([message[i].lower() if i%2 == 0 and message[i].isalpha()
+            else message[i].upper() for i in range(len(message))])
 
 def db_install():
     try:
