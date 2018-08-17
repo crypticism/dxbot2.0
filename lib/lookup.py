@@ -91,7 +91,6 @@ def getLookupCount(args, users):
         cur.close()
         return "There are {} quotes containing {}.".format(count, searchString)
     else:
-        cur.close()
         sql = """
             SELECT *
             FROM quotes
@@ -102,7 +101,8 @@ def getLookupCount(args, users):
         cur.execute(sql)
         (count,) = cur.fetchone()
         if count:
+            cur.close()
             return "There are {} quotes containing {}.".format(count, searchString)
 
-
+    cur.close()
     return "There are no quotes with {} in it.".format(searchString)
