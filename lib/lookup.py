@@ -64,11 +64,9 @@ def getLookupCount(args, users):
     searchString = args.replace('#', '').strip()
 
     sql = """
-        SELECT *
+        SELECT COUNT(*)
         FROM quotes
         WHERE quote ILIKE '%%%s%%'
-        ORDER BY RANDOM()
-        LIMIT 1;
     """ % args
 
     cur.execute(sql)
