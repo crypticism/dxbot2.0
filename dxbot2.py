@@ -56,14 +56,18 @@ def refresh_users():
     }
 
 def spongeify(message):
+    responge = '^([\w\-]+ )(.*)'
+    match = re.search(responge, message)
+    u_temp = match.group(1)
+    m_temp = match.group(2)
     sponge = [_.lower() if i % 2 == 0 else _.upper()
         for i, _
-        in enumerate(char for char in message if char.isalpha())
+        in enumerate(char for char in m_temp if char.isalpha())
     ]
     [sponge.insert(*_) for _ in
-        [(i, char) for i, char in enumerate(message) if not char.isalpha()]
+        [(i, char) for i, char in enumerate(m_temp) if not char.isalpha()]
     ]
-    return ''.join(sponge)
+    return u_temp+''.join(sponge)
 
 def db_install():
     try:
