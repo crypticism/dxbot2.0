@@ -53,6 +53,15 @@ def refresh_users():
         if member['name'] not in EXCLUSION_LIST
     }
 
+def spongeify(message):
+    sponge = [_.lower() if i % 2 == 0 else _.upper()
+        for i, _
+        in enumerate(char for char in message if char.isalpha())
+    ]
+    [sponge.insert(*_) for _ in
+        [(i, char) for i, char in enumerate(message) if not char.isalpha()]
+    ]
+    return ''.join(sponge)
 
 def db_install():
     try:
@@ -185,8 +194,11 @@ def handle_command(command, args, channel, prev):
         else:
             response = 'No arguments provided'
 
-    if command.startswith('grab'):
+    if command.startswith(('grab','yoink','snag')):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
+        if command.startswith('yoink'):
+            message = spongeify(message)
+
         response = addQuote(message, users, user_map)
 
     if command.startswith('usage'):
@@ -208,6 +220,8 @@ def handle_command(command, args, channel, prev):
         response = getLeaderboard()
     if command.startswith('christian'):
         response = getChristian()
+    if (command[0].isdigit() and command):
+        return
 
     client.api_call(
         'chat.postMessage',
