@@ -104,7 +104,7 @@ def getQuoteByLookupExact(args, users):
     sql = """
         SELECT *
         FROM quotes
-        WHERE quote quote ~* '.*\y%s\y.*'
+        WHERE quote ~* '.*\y%s\y.*'
         ORDER BY RANDOM()
         LIMIT 1;
     """ % args
