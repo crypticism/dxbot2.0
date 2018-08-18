@@ -24,40 +24,23 @@ def getQuoteByLookup(args, users):
     cur = conn.cursor()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
+        SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
     """ % args
 
     cur.execute(sql)
     (count,) = cur.fetchone()
 
     if not count:
-        sql = """
-            SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
-        """ % args
+        cur.close()
+        return 'No quotes with {} in it'.format(args)
 
-        cur.execute(sql)
-        (count,) = cur.fetchone()
-
-        if not count:
-            cur.close()
-            return 'No quotes with {} in it'.format(args)
-
-        sql = """
-            SELECT *
-            FROM quotes
-            WHERE quote ILIKE '%%%s%%'
-            ORDER BY RANDOM()
-            LIMIT 1;
-        """ % args
-
-    else:
-        sql = """
-            SELECT *
-            FROM quotes
-            WHERE quote ~* '.*\y%s\y.*'
-            ORDER BY RANDOM()
-            LIMIT 1;
-        """ % args
+    sql = """
+        SELECT *
+        FROM quotes
+        WHERE quote ILIKE '%%%s%%'
+        ORDER BY RANDOM()
+        LIMIT 1;
+    """ % args
 
     cur.execute(sql)
     (num, name, quote) = cur.fetchone()
@@ -81,28 +64,18 @@ def getLookupCount(args, users):
     searchString = args.replace('#', '').strip()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
+        SELECT *
+        FROM quotes
+        WHERE quote ILIKE '%%%s%%'
+        ORDER BY RANDOM()
+        LIMIT 1;
     """ % args
 
     cur.execute(sql)
     (count,) = cur.fetchone()
+    cur.close()
 
     if count:
-        cur.close()
         return "There are {} quotes containing {}.".format(count, searchString)
-    else:
-        sql = """
-            SELECT *
-            FROM quotes
-            WHERE quote ILIKE '%%%s%%'
-            ORDER BY RANDOM()
-            LIMIT 1;
-        """ % args
-        cur.execute(sql)
-        (count,) = cur.fetchone()
-        if count:
-            cur.close()
-            return "There are {} quotes containing {}.".format(count, searchString)
 
-    cur.close()
     return "There are no quotes with {} in it.".format(searchString)
