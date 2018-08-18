@@ -54,12 +54,12 @@ def refresh_users():
     }
 
 def spongeify(message):
-    sponge = [z.lower() if i % 2 == 0 else z.upper()
-                for i, z
-                in enumerate(_ for _ in message if _.isalpha())
-             ]
+    sponge = [_.lower() if i % 2 == 0 else _.upper()
+        for i, _
+        in enumerate(char for char in message if char.isalpha())
+    ]
     [sponge.insert(*_) for _ in
-        [(i,c) for i, c in enumerate(message) if not c.isalpha()]
+        [(i, char) for i, char in enumerate(message) if not char.isalpha()]
     ]
     return ''.join(sponge)
 
@@ -197,9 +197,9 @@ def handle_command(command, args, channel, prev):
     if command.startswith(('grab','yoink','snag')):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         if command.startswith('yoink'):
-            response = addQuote(spongeify(message), users, user_map)
-        else:
-            response = addQuote(message, users, user_map)
+            message = spongeify(message)
+
+        response = addQuote(message, users, user_map)
 
     if command.startswith('usage'):
         response = getUsageCounts()
