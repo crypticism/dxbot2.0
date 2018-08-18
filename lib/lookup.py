@@ -67,7 +67,7 @@ def getLookupCount(args, users):
         SELECT COUNT(*)
         FROM quotes
         WHERE quote ILIKE '%%%s%%'
-    """ % args
+    """ % searchString
 
     cur.execute(sql)
     (count,) = cur.fetchone()
@@ -134,7 +134,7 @@ def getLookupCountExact(args, users):
         SELECT COUNT(*)
         FROM quotes
         WHERE quote ~* '.*\y%s\y.*'
-    """ % args
+    """ % searchString
 
     cur.execute(sql)
     (count,) = cur.fetchone()
