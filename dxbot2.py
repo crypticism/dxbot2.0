@@ -200,6 +200,15 @@ def handle_command(command, args, channel, prev):
         else:
             response = 'No arguments provided'
 
+    if command.startswith('elookup'):
+        if args is not None:
+            if re.search('^[\w\s]+#$', args):
+                response = getLookupCountExact(args, users)
+            else:
+                response = getQuoteByLookupExact(args, users)
+        else:
+            response = 'No arguments provided'
+
     if command.startswith(('grab','yoink','snag')):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         if command.startswith('yoink'):
