@@ -91,7 +91,7 @@ def getQuoteByLookupExact(args, users):
     cur = conn.cursor()
 
     sql = """
-        SELECT COUNT(*) FROM quotes WHERE quote ILIKE '%%%s%%'
+        SELECT COUNT(*) FROM quotes WHERE quote ~* '.*\y%s\y.*'
     """ % args
 
     cur.execute(sql)
