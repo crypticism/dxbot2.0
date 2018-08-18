@@ -40,6 +40,8 @@ EXCLUSION_LIST = [
 ]
 
 def refresh_users():
+    global users
+    global user_map
     users = [
         member['name']
         for member
