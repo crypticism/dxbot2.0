@@ -6,7 +6,7 @@ import psycopg2
 from slackclient import SlackClient
 
 from lib.leaderboard import decrementUser, getLeaderboard, incrementUser
-from lib.lookup import getLookupCount, getQuoteByLookup, getLookupCountExact, getQuoteByLookupExact,
+from lib.lookup import getLookupCount, getQuoteByLookup, getLookupCountExact, getQuoteByLookupExact
 from lib.mcar import getChristian
 from lib.quote import addQuote, getQuote
 from lib.usage import getUsageCounts
