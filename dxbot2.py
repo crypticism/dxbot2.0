@@ -54,8 +54,11 @@ def refresh_users():
     }
 
 def spongeify(message):
-    return ''.join([message[i].lower() if i%2 == 0 and message[i].isalpha()
-            else message[i].upper() for i in range(len(message))])
+    sponge = [z.lower() if i % 2 == 0 else z.upper()
+                for i, z in enumerate(_ for _ in message if _.isalpha())]
+    [sponge.insert(*_) for _ in [(i,c) for i, c in enumerate(message)
+        if not c.isalpha()]]
+    return ''.join(sponge)
 
 def db_install():
     try:
