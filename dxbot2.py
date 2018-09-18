@@ -42,12 +42,15 @@ EXCLUSION_LIST = [
 def refresh_users():
     global users
     global user_map
-    users = [
-        member['name']
-        for member
-        in client.api_call('users.list')['members']
-        if member['name'] not in EXCLUSION_LIST
-    ]
+    try:
+        users = [
+            member['name']
+            for member
+            in client.api_call('users.list')['members']
+            if member['name'] not in EXCLUSION_LIST
+        ]
+    except:
+        return
     try:
         user_map = {
             member['id']: member['name']
