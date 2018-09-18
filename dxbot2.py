@@ -48,12 +48,15 @@ def refresh_users():
         in client.api_call('users.list')['members']
         if member['name'] not in EXCLUSION_LIST
     ]
-    user_map = {
-        member['id']: member['name']
-        for member
-        in client.api_call('users.list')['members']
-        if member['name'] not in EXCLUSION_LIST
-    }
+    try:
+        user_map = {
+            member['id']: member['name']
+            for member
+            in client.api_call('users.list')['members']
+            if member['name'] not in EXCLUSION_LIST
+        }
+    except:
+        return
 
 def spongeify(message):
     responge = '^([\w\-]+ )(.*)'
