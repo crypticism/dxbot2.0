@@ -59,6 +59,7 @@ def refresh_users():
             in client.api_call('users.list')['members']
             if member['name'] not in EXCLUSION_LIST
         }
+        last_get = current_get
     else:
         return
 
