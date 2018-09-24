@@ -89,13 +89,11 @@ def pastafy(message):
 					couldbemoji = ':{}:'.format(grain)
 					if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
 						splitnoodle[findex] = (grain+couldbemoji)
-			pasta[index] = (':').join(splitnoodle)
+			pasta[index] = ('').join(splitnoodle)
 		else:
 			couldbemoji = ':{}:'.format(noodle)
-			if couldbemoji in emoji.EMOJI_ALIAS_UNICODE:
+			if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
 				pasta[index] = (noodle+couldbemoji)
-			if couldbemoji in custom_emoji_list:
-				pasta[index] = (couldbemoji)
 	return u_temp+' '.join(pasta)
 	
 def db_install():
