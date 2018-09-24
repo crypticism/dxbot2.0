@@ -89,6 +89,7 @@ def pastafy(message):
 					couldbemoji = ':{}:'.format(grain)
 					if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
 						splitnoodle[findex] = (grain+couldbemoji)
+			# Removes colons
 			pasta[index] = ('').join(splitnoodle)
 		else:
 			couldbemoji = ':{}:'.format(noodle)
