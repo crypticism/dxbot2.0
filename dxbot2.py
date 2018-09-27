@@ -72,30 +72,30 @@ def spongeify(message):
     return u_temp+''.join(sponge)
 
 def pastafy(message):
-	emoji = client.api_call('emoji.list')['emoji']
-	custom_emoji_list = emoji.keys()
+    emoji = client.api_call('emoji.list')['emoji']
+    custom_emoji_list = emoji.keys()
 	
-	regetti = '^([\w\-]+ )(.*)'
-	match = re.search(regetti, message)
-	u_temp = match.group(1)
-	m_temp = match.group(2)
+    regetti = '^([\w\-]+ )(.*)'
+    match = re.search(regetti, message)
+    u_temp = match.group(1)
+    m_temp = match.group(2)
 
-	pasta = m_temp.split()
-	for index, noodle in enumerate(pasta):
-		if noodle.count(':') > 1:
-			splitnoodle = noodle.split(':')
-			for findex, grain in enumerate(splitnoodle):
-				if grain:
-					couldbemoji = ':{}:'.format(grain)
-					if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
-						splitnoodle[findex] = (grain+couldbemoji)
-			# Removes colons
-			pasta[index] = ('').join(splitnoodle)
-		else:
-			couldbemoji = ':{}:'.format(noodle)
-			if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
-				pasta[index] = (noodle+couldbemoji)
-	return u_temp+' '.join(pasta)
+    pasta = m_temp.split()
+    for index, noodle in enumerate(pasta):
+        if noodle.count(':') > 1:
+	    splitnoodle = noodle.split(':')
+	    for findex, grain in enumerate(splitnoodle):
+	        if grain:
+		    couldbemoji = ':{}:'.format(grain)
+		    if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
+		        splitnoodle[findex] = (grain+couldbemoji)
+	# Removes colons
+	pasta[index] = ('').join(splitnoodle)
+    else:
+        couldbemoji = ':{}:'.format(noodle)
+        if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
+            pasta[index] = (noodle+couldbemoji)
+return u_temp+' '.join(pasta)
 	
 def db_install():
     try:
