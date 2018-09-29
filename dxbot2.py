@@ -82,14 +82,14 @@ def pastafy(message):
 
     pasta = m_temp.split()
     for index, noodle in enumerate(pasta):
-        if noodle.count(':') > 1:
+        if noodle.count(':') > 0:
 	    splitnoodle = noodle.split(':')
 	    for findex, grain in enumerate(splitnoodle):
 	        if grain:
 		    couldbemoji = ':{}:'.format(grain)
 		    if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
 		        splitnoodle[findex] = (grain+couldbemoji)
-	# Removes colons
+	# join does not retain any colons from original message
 	pasta[index] = ('').join(splitnoodle)
     else:
         couldbemoji = ':{}:'.format(noodle)
