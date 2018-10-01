@@ -241,8 +241,8 @@ def handle_command(command, args, channel, prev):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         if command.startswith('yoink'):
             message = spongeify(message)
-		if command.startswith('slurp'):
-			message = pastafy(message)
+        if command.startswith('slurp'):
+            message = pastafy(message)
 
         response = addQuote(message, users, user_map)
 
