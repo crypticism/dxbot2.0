@@ -89,12 +89,12 @@ def pastafy(message):
 		    couldbemoji = ':{}:'.format(grain)
 		    if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
 		        splitnoodle[findex] = (grain+couldbemoji)
-	# join does not retain any colons from original message
-	pasta[index] = ('').join(splitnoodle)
-    else:
-        couldbemoji = ':{}:'.format(noodle)
-        if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
-            pasta[index] = (noodle+couldbemoji)
+	    # join does not retain any colons from original message
+	    pasta[index] = ('').join(splitnoodle)
+        else:
+            couldbemoji = ':{}:'.format(noodle)
+            if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
+                pasta[index] = (noodle+couldbemoji)
 return u_temp+' '.join(pasta)
 	
 def db_install():
