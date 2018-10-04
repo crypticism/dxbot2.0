@@ -2,6 +2,8 @@ import os
 import time
 import re
 
+import emoji
+
 import psycopg2
 from slackclient import SlackClient
 
@@ -69,6 +71,32 @@ def spongeify(message):
     ]
     return u_temp+''.join(sponge)
 
+def pastafy(message):
+    emoji = client.api_call('emoji.list')['emoji']
+    custom_emoji_list = emoji.keys()
+
+    regetti = '^([\w\-]+ )(.*)'
+    match = re.search(regetti, message)
+    u_temp = match.group(1)
+    m_temp = match.group(2)
+
+    pasta = m_temp.split()
+    for index, noodle in enumerate(pasta):
+        if noodle.count(':') > 0:
+	    splitnoodle = noodle.split(':')
+	    for findex, grain in enumerate(splitnoodle):
+	        if grain:
+		    couldbemoji = ':{}:'.format(grain)
+		    if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
+		        splitnoodle[findex] = (grain+couldbemoji)
+	    # join does not retain any colons from original message
+	    pasta[index] = ('').join(splitnoodle)
+        else:
+            couldbemoji = ':{}:'.format(noodle)
+            if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
+                pasta[index] = (noodle+couldbemoji)
+return u_temp+' '.join(pasta)
+	
 def db_install():
     try:
         conn = psycopg2.connect(CONNECT_STRING)
@@ -209,10 +237,12 @@ def handle_command(command, args, channel, prev):
         else:
             response = 'No arguments provided'
 
-    if command.startswith(('grab','yoink','snag')):
+    if command.startswith(('grab','yoink','snag','slurp')):
         message = '{} {}'.format(user_map[prev['user']], prev['text'])
         if command.startswith('yoink'):
             message = spongeify(message)
+        if command.startswith('slurp'):
+            message = pastafy(message)
 
         response = addQuote(message, users, user_map)
 
