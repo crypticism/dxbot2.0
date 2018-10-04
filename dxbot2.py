@@ -1,6 +1,7 @@
 import os
 import time
 import re
+import datetime
 
 import emoji
 
@@ -20,6 +21,7 @@ dxbot_id = None
 users = []
 user_map = {}
 last_event = None
+last_get = datetime.datetime.now()
 
 # Constants
 READ_DELAY = 1  # 1 second read delay
@@ -44,18 +46,24 @@ EXCLUSION_LIST = [
 def refresh_users():
     global users
     global user_map
-    users = [
-        member['name']
-        for member
-        in client.api_call('users.list')['members']
-        if member['name'] not in EXCLUSION_LIST
-    ]
-    user_map = {
-        member['id']: member['name']
-        for member
-        in client.api_call('users.list')['members']
-        if member['name'] not in EXCLUSION_LIST
-    }
+    global last_get
+    current_get = datetime.datetime.now()
+    if ((current_get-last_get).seconds >= 1800) or users == [] or user_map == {}:
+        users = [
+            member['name']
+            for member
+            in client.api_call('users.list')['members']
+            if member['name'] not in EXCLUSION_LIST
+        ]
+        user_map = {
+            member['id']: member['name']
+            for member
+            in client.api_call('users.list')['members']
+            if member['name'] not in EXCLUSION_LIST
+        }
+        last_get = current_get
+    else:
+        return
 
 def spongeify(message):
     responge = '^([\w\-]+ )(.*)'
