@@ -99,10 +99,9 @@ def getQuoteByID(args):
 
     sql = """
         SELECT ID,NAME,QUOTE
-        FROM (
-            SELECT row_number() OVER (ORDER BY id asc) AS roww, * FROM quotes
-        ) a
-        WHERE roww = CASE
+        FROM 
+        quotes
+        WHERE ID = CASE
         WHEN %s > 0 THEN %s
         WHEN %s > (
             SELECT COUNT(*) FROM quotes
