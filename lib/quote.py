@@ -90,7 +90,7 @@ def getQuoteByID(args):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    cur.execute('SELECT COUNT(*) FROM quotes;')
+    cur.execute('SELECT MAX(ID) FROM quotes;')
     (count,) = cur.fetchone()
 
     if int(args) > count or abs(int(args))+1 > count:
@@ -104,9 +104,9 @@ def getQuoteByID(args):
         WHERE ID = CASE
         WHEN %s > 0 THEN %s
         WHEN %s > (
-            SELECT COUNT(*) FROM quotes
+            SELECT MAX(ID) FROM quotes
         ) THEN '1'ELSE (
-            SELECT COUNT(*) + %s FROM quotes
+            SELECT MAX(ID) + %s FROM quotes
         ) END;
     """
 
@@ -126,7 +126,7 @@ def getQuoteCount():
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    cur.execute('SELECT COUNT(*) FROM quotes;')
+    cur.execute('SELECT MAX(ID) FROM quotes;')
     (count,) = cur.fetchone()
     cur.close()
 
