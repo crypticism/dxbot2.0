@@ -16,6 +16,7 @@ from lib.usage import getUsageCounts
 
 # Create client
 client = SlackClient(os.environ.get('DXBOT_TOKEN'))
+client2 = SlackClient(os.environ.get('DXBOT_USER_TOKEN'))
 # User ID: Set after connecting
 dxbot_id = None
 users = []
@@ -80,9 +81,9 @@ def spongeify(message):
     return u_temp+''.join(sponge)
 
 def pastafy(message):
-    emoji = client.api_call('emoji.list')['emoji']
-    custom_emoji_list = emoji.keys()
-
+    temoji = client2.api_call('emoji.list')['emoji']
+    custom_emoji_list = temoji.keys()
+    custom_emoji_list = [':{}:'.format(_) for _ in custom_emoji_list]
     regetti = '^([\w\-]+ )(.*)'
     match = re.search(regetti, message)
     u_temp = match.group(1)
@@ -91,20 +92,20 @@ def pastafy(message):
     pasta = m_temp.split()
     for index, noodle in enumerate(pasta):
         if noodle.count(':') > 0:
-	    splitnoodle = noodle.split(':')
-	    for findex, grain in enumerate(splitnoodle):
-	        if grain:
-		    couldbemoji = ':{}:'.format(grain)
-		    if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
-		        splitnoodle[findex] = (grain+couldbemoji)
+            splitnoodle = noodle.split(':')
+            for findex, grain in enumerate(splitnoodle):
+                if grain:
+                    couldbemoji = ':{}:'.format(grain)
+                    if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
+                        splitnoodle[findex] = (grain+couldbemoji)
 	    # join does not retain any colons from original message
-	    pasta[index] = ('').join(splitnoodle)
+            pasta[index] = ('').join(splitnoodle)
         else:
             couldbemoji = ':{}:'.format(noodle)
             if couldbemoji in emoji.EMOJI_ALIAS_UNICODE or couldbemoji in custom_emoji_list:
                 pasta[index] = (noodle+couldbemoji)
-return u_temp+' '.join(pasta)
-	
+    return u_temp+' '.join(pasta)
+
 def db_install():
     try:
         conn = psycopg2.connect(CONNECT_STRING)
