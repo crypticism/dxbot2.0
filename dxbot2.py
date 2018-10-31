@@ -83,7 +83,7 @@ def spongeify(message):
 def pastafy(message):
     temoji = client2.api_call('emoji.list')['emoji']
     custom_emoji_list = temoji.keys()
-    custom_emoji_list = [':' + _ + ':' for _ in custom_emoji_list]
+    custom_emoji_list = [':{}:'.format(_) for _ in custom_emoji_list]
     regetti = '^([\w\-]+ )(.*)'
     match = re.search(regetti, message)
     u_temp = match.group(1)
