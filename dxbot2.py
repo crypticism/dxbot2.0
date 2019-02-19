@@ -14,6 +14,8 @@ from lib.mcar import getChristian
 from lib.quote import addQuote, getQuote
 from lib.usage import getUsageCounts
 
+from environs import Env
+
 # Create client
 client = SlackClient(os.environ.get('DXBOT_TOKEN'))
 client2 = SlackClient(os.environ.get('DXBOT_USER_TOKEN'))
@@ -26,6 +28,7 @@ last_get = datetime.datetime.now()
 
 # Constants
 READ_DELAY = 1  # 1 second read delay
+ADDITIONAL_NICKS = env.list("ADDITIONAL_NICKS")
 COMMAND_CHARACTER = os.getenv('COMMAND_CHARACTER', '!')
 COMMAND_REGEX = r"^" + re.escape(COMMAND_CHARACTER) + \
     r"(?P<command>[\w+-]+) ?(?P<message>.*)?$"
@@ -55,13 +58,17 @@ def refresh_users():
             for member
             in client.api_call('users.list')['members']
             if member['name'] not in EXCLUSION_LIST
-        ]
+        ] + ADDITIONAL_NICKS
         user_map = {
             member['id']: member['name']
             for member
             in client.api_call('users.list')['members']
             if member['name'] not in EXCLUSION_LIST
-        }
+        } + {
+                nick: nick
+                for nick
+                in ADDITIONAL_NICKS
+            }
         last_get = current_get
     else:
         return
