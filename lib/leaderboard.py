@@ -88,7 +88,7 @@ def decrementUser(args, users, user_map):
     if cur.rowcount > 0:
         (count,) = cur.fetchone()
 
-    if count:
+    if count is not None:
         count = count - 1
         sql = """
           UPDATE leaderboard
