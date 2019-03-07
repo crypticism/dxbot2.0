@@ -81,11 +81,12 @@ def decrementUser(args, users, user_map):
     cur = conn.cursor()
 
     sql = """
-      SELECT COUNT(*) FROM leaderboard WHERE name = %s;
+      SELECT count FROM leaderboard WHERE name = %s AND count IS NOT NULL;
     """
 
     cur.execute(sql, (user,))
-    (count,) = cur.fetchone()
+    if cur.rowcount > 0:
+        (count,) = cur.fetchone()
 
     if count:
         count = count - 1
