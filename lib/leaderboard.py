@@ -31,12 +31,13 @@ def incrementUser(args, users, user_map):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    sql = "SELECT COUNT(*) FROM leaderboard WHERE name = %s;"
+    sql = "SELECT count FROM leaderboard WHERE name = %s AND count IS NOT NULL;"
 
     cur.execute(sql, (user,))
-    (count,) = cur.fetchone()
-
-    if count:
+    if cur.rowcount > 0:
+        (count,) = cur.fetchone()
+    
+    if count is not None:
         count = count + 1
         sql = """
           UPDATE leaderboard
