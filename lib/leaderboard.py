@@ -37,12 +37,14 @@ def incrementUser(args, users, user_map):
     (count,) = cur.fetchone()
 
     if count:
+        count = count + 1
         sql = """
           UPDATE leaderboard
           SET count = count + 1
           WHERE name = %s;
         """
     else:
+        count = 1
         sql = """
         INSERT INTO leaderboard
         (name, count)
@@ -51,17 +53,10 @@ def incrementUser(args, users, user_map):
 
     cur.execute(sql, (user,))
 
-    sql = """
-      SELECT name, count FROM leaderboard WHERE name = %s;
-    """
-
-    cur.execute(sql, (user,))
-    (name, count) = cur.fetchone()
-
     conn.commit()
     cur.close()
 
-    return '{}\'s score is {}'.format(name, count)
+    return '{}\'s score is {}'.format(user, count)
 
 
 def decrementUser(args, users, user_map):
@@ -92,31 +87,24 @@ def decrementUser(args, users, user_map):
     (count,) = cur.fetchone()
 
     if count:
+        count = count - 1
         sql = """
           UPDATE leaderboard
           SET count = count - 1
           WHERE name = %s;
         """
     else:
+        count = -1
         sql = """
         INSERT INTO leaderboard
         (name, count)
         VALUES (%s, -1);
         """
 
-    cur.execute(sql, (user,))
-
-    sql = """
-      SELECT name, count FROM leaderboard WHERE name = %s;
-    """
-
-    cur.execute(sql, (user,))
-    (name, count) = cur.fetchone()
-
     conn.commit()
     cur.close()
 
-    return '{}\'s score is {}'.format(name, count)
+    return '{}\'s score is {}'.format(user, count)
 
 
 def getLeaderboard():
