@@ -31,18 +31,21 @@ def incrementUser(args, users, user_map):
     conn = psycopg2.connect(CONNECT_STRING)
     cur = conn.cursor()
 
-    sql = "SELECT COUNT(*) FROM leaderboard WHERE name = %s;"
+    sql = "SELECT count FROM leaderboard WHERE name = %s AND count IS NOT NULL;"
 
     cur.execute(sql, (user,))
-    (count,) = cur.fetchone()
-
-    if count:
+    if cur.rowcount > 0:
+        (count,) = cur.fetchone()
+    
+    if count is not None:
+        count = count + 1
         sql = """
           UPDATE leaderboard
           SET count = count + 1
           WHERE name = %s;
         """
     else:
+        count = 1
         sql = """
         INSERT INTO leaderboard
         (name, count)
@@ -51,17 +54,10 @@ def incrementUser(args, users, user_map):
 
     cur.execute(sql, (user,))
 
-    sql = """
-      SELECT name, count FROM leaderboard WHERE name = %s;
-    """
-
-    cur.execute(sql, (user,))
-    (name, count) = cur.fetchone()
-
     conn.commit()
     cur.close()
 
-    return '{}\'s score is {}'.format(name, count)
+    return '{}\'s score is {}'.format(user, count)
 
 
 def decrementUser(args, users, user_map):
@@ -85,38 +81,32 @@ def decrementUser(args, users, user_map):
     cur = conn.cursor()
 
     sql = """
-      SELECT COUNT(*) FROM leaderboard WHERE name = %s;
+      SELECT count FROM leaderboard WHERE name = %s AND count IS NOT NULL;
     """
 
     cur.execute(sql, (user,))
-    (count,) = cur.fetchone()
+    if cur.rowcount > 0:
+        (count,) = cur.fetchone()
 
-    if count:
+    if count is not None:
+        count = count - 1
         sql = """
           UPDATE leaderboard
           SET count = count - 1
           WHERE name = %s;
         """
     else:
+        count = -1
         sql = """
         INSERT INTO leaderboard
         (name, count)
         VALUES (%s, -1);
         """
 
-    cur.execute(sql, (user,))
-
-    sql = """
-      SELECT name, count FROM leaderboard WHERE name = %s;
-    """
-
-    cur.execute(sql, (user,))
-    (name, count) = cur.fetchone()
-
     conn.commit()
     cur.close()
 
-    return '{}\'s score is {}'.format(name, count)
+    return '{}\'s score is {}'.format(user, count)
 
 
 def getLeaderboard():
