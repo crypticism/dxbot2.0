@@ -16,7 +16,6 @@ def getQuoteByLookup(args, users):
     Retrieve a random quote containing a specific word.
     """
     updateUsageCount('Lookup Quote')
-
     if not re.search('^[\w\s]+$', args):
         return "That's not a safe string. Please try again."
 
@@ -47,6 +46,36 @@ def getQuoteByLookup(args, users):
     cur.close()
 
     return '#{}: {} - "{}"'.format(num, name, quote)
+
+def getUserQuoteCount(lookupUser,users):
+    """
+    Retrieve the count of quotes for a specific user
+    """
+    updateUsageCount('Lookup Quote Count')
+
+    conn = psycopg2.connect(CONNECT_STRING)
+    cur = conn.cursor()
+
+    if not re.search('^\w+$', args):
+        return "That's not a safe string. Please try again."
+
+    user = user_map.get(lookupUser, None)
+    if user is None:
+        return '{} is not a valid user.'.format(args)
+
+    sql = """
+        SELECT COUNT(*)
+        FROM quotes
+        WHERE name = %s
+        """
+    cur.execture(sql, (user,))
+    (count,) = cur.fetchone()
+
+    if not count:
+        cur.close()
+        return '{} has no quotes.'.format(user)
+
+    return '{} has {} quotes.'.format(user,count)
 
 
 def getLookupCount(args, users):

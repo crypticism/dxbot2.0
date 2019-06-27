@@ -9,7 +9,7 @@ import psycopg2
 from slackclient import SlackClient
 
 from lib.leaderboard import decrementUser, getLeaderboard, incrementUser
-from lib.lookup import getLookupCount, getQuoteByLookup, getLookupCountExact, getQuoteByLookupExact
+from lib.lookup import getLookupCount, getQuoteByLookup, getLookupCountExact, getQuoteByLookupExact, getUserQuoteCount
 from lib.mcar import getChristian
 from lib.quote import addQuote, getQuote
 from lib.usage import getUsageCounts
@@ -230,8 +230,13 @@ def handle_command(command, args, channel, prev):
 
     if command.startswith('lookup'):
         if args is not None:
-            if re.search('^[\w\s]+#$', args):
-                response = getLookupCount(args, users)
+            matches = re.search('^[\w\s]+(?P<user>[<]@\w+[>])?[\w\s]+#$'):
+            if matches:
+                lookupUser = matches.group('user')
+                if lookupUser:
+                    response = getUserQuoteCount(lookupUser[2:-1].strip(), users)
+                else:
+                    response = getLookupCount(args, users)
             else:
                 response = getQuoteByLookup(args, users)
         else:
